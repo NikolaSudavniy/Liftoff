@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+  <style>
+    div, a{
+      box-sizing: border-box;
+    }
+    body {
+      height: 100vh;
+ 			margin: 0;
+			background: url(Footage/Images/BG/Watermark-BG.webp) center / cover no-repeat;
+		}
+
+    .wrap{
+      height: 100vh;
+			max-width:  calc(100vh * 9 / 16);
+			margin: 0 auto;
+			overflow: hidden;
+			position: relative;
+      background: linear-gradient(to bottom, rgb(3, 3, 168), black);
+    }
+
+    .mask{
+      height: 100%;
+      width: 0;
+      margin: 0 auto;
+      overflow: hidden;
+      animation: scaleIn 1s forwards;
+    }
+
+     @keyframes scaleIn{
+      0% {
+        width: 0;
+       
+      }
+      100%{
+        width: 100%;
+      }
+    }
+
+    .main{
+      height: 100%;
+      background: url(Footage/Images/BG/BG.webp) center / cover no-repeat;
+    }
+
+    .start{
+      position: absolute;
+      top: -10vh;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: logoMoveIn 1s cubic-bezier(.79,.62,.59,1.43) forwards;
+      animation-delay: .3s;
+    }
+
+    @keyframes logoMoveIn{
+      0% {
+        top: -10vh;
+      }
+      100%{
+        top: 50%;
+      }
+    }
+
+    .hand{
+      display: block;
+      width: 20vh;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(20%, 5%) rotate(0deg);
+      animation: handRotate 2s cubic-bezier(.78,.71,.69,1.86) infinite;
+      transform-origin: 70% 100%;
+      opacity: 0;
+      transition: opacity .3s ease-in;
+    }
+
+    @keyframes handRotate{
+      0% {
+        transform: translate(20%, 5%) rotate(0deg);
+      }
+      40% {
+        transform: translate(20%, 5%) rotate(-15deg);
+      }
+      60%{
+        transform: translate(20%, 5%) rotate(0deg);
+      }
+   
+    }
+
+    .start .media{
+      width: 20vh;
+      height: 20vh; 
+      border-radius: 6vh;
+      background: #fff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      /***тени***/
+    }
+
+    .start .media.click{
+      animation: 1s fadeStart forwards;
+    }
+
+    @keyframes fadeStart{
+      0% {
+        background: #ffffff;
+      }
+      50%{
+        background: #dedede;
+      }
+      70%{
+        background: #ffffff;
+        opacity: 1;
+      }
+      100%{
+        opacity: 0;
+      }
+    }
+
+    .main_logo{
+      width: 15vh;
+    }
+
+    .list{
+      width: 100%;
+      height: 100%;
+      padding: 2vh 4vh;
+      display: grid;
+      grid-template-rows: repeat(6, 1fr);
+      gap: 1.2vh; 
+    }
+
+    .list .btn{
+      width: 100%;
+      height: 100%;
+      border-radius: 4vh;
+      background: #fff;
+      display: block;
+      opacity: 0;
+      padding: 0.4vh 1vh;
+    }
+    .btn-left{
+      transform: translate(-150%);
+    }
+    .btn-right{
+      transform: translate(150%);
+    }
+
+    .list .btn.click{
+      opacity: 1;
+      transform: translate(0);
+      transition: transform 1s;
+      transition-delay: .3s
+    }
+
+    .list .btn.press{
+      background: #d0d0d0;
+      transition: background .2s;
+    }
+
+    .list .btn .media,
+    .preview-info .media{
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .avatar{
+      height: 12vh;
+    }
+
+    .view{
+      height: 6vh;
+      opacity: 0.75;
+      transition: 0.5s ;
+    }
+
+    .btn:hover .view,
+    .view:hover{
+      opacity: 1;
+    }
+
+    .overlay,
+    .preview{
+      position: absolute;
+      left: -100%;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      padding: 7vh 4vh;
+    }
+
+    .overlay{
+      background: rgba(0, 0, 0, 0.36);
+      opacity: 0;
+      transition: opacity  0.8s;
+      transition-delay: .3s;
+    }
+
+    .preview .card{
+      background: #ffffff;
+      width: 100%;
+      height: 100%;
+      border-radius: 4vh;
+      padding: 1.3vh;
+      transform: scale(0);
+      transition: transform  0.8s;
+      transition-delay: .3s;
+    }
+
+    .overlay.show{
+      left: 0;
+      display: block;
+      opacity: 1;
+    }
+    .preview.show {
+      left: 0;
+    }
+
+    .preview.show .card{
+      transform: scale(1);
+    }
+
+    .overlay.hide{
+      opacity: 0;
+    }
+
+    .preview.hide .card{
+      transform: scale(0);
+      position: relative;
+    }
+
+    .close{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 6vh;
+      height: 6vh;
+      position: absolute;
+      right: 3vh;
+      top: 3vh;
+      transition: 0.5s ;
+      z-index: 2;
+    }
+
+    .close:hover,
+    .close:active{
+      opacity: 0.7;
+    }
+
+    .close img{
+      width: 100%;
+    }
+
+    .wrap-video{
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: none;  /*******/
+    }
+
+    .wrap-video video{
+      height: 100%;
+      width: 100%;
+      border-radius: 3.5vh;
+      object-fit: cover;
+    }
+
+    .wrap-video .stream-header,
+    .wrap-video .stream-message{
+      display: none;
+    }
+
+    .preview-info{
+      position: absolute;
+      bottom: -1.3vh;
+      left: 0;
+      right: 0;
+      width: 100%;
+      border-radius: 3vh;
+      background: #fff;
+      padding: 0.4vh 1vh;
+    }
+
+    .animErrorBtn{
+      animation: 1s moveError forwards;
+    }
+
+    @keyframes moveError{
+      0% {
+        transform: translate(0);
+      }
+      30%{
+        transform: translate(-3vh);
+        background: #d0d0d0;
+      }
+      70%{
+        transform: translate(3vh);
+        background: #d0d0d0;
+      }
+      100%{
+        transform: translate(0);
+      }
+    }
+
+    .end-card{
+      position: absolute;
+      z-index: 20;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(180deg,rgba(29, 160, 249, 1) 0%, rgba(20, 104, 207, 1) 100%);
+      display: none;
+    }
+
+    .end-content{
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+
+    .end-logo{
+      width: 50vh;
+      position: absolute;
+      top: 30vh;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+
+    .btn-wrap{
+      position: absolute;
+      bottom: 26vh;
+      left: 0;
+      right: 0;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 3vh;
+    }
+
+    .btn-wrap a{
+      display: block;
+      margin: 0 auto;
+    }
+
+    .btn-wrap img{
+      width: 30vh;
+      transition: .2s;
+    }
+
+    .btn-wrap .IOS img{
+      animation: 2s scaleIOS ease-in-out  infinite;
+    }
+
+    .btn-wrap .Android img{
+      animation: 2s scaleAndroid ease-in-out infinite;
+    }
+
+    .btn-wrap img:hover{
+      animation-play-state: paused;
+      width: 35vh;
+    }
+
+    .btn-wrap img:active{
+      animation-play-state: paused;
+      width: 25vh;
+    }
+
+    @keyframes scaleIOS{
+      0% { transform: scale(1); }
+      20%{ transform: scale(1); }
+      40%{ transform: scale(0.5); }
+      60%{ transform: scale(1); }
+    }
+
+    @keyframes scaleAndroid{
+      0% { transform: scale(1); }
+      20%{ transform: scale(0.5); }
+      40%{ transform: scale(1); }
+      100%{ transform: scale(1); }
+    }
+
+    .stream{
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+      display: none;
+    }
+
+    .stream video{
+      height: 100%;
+      width: 100%;
+      object-fit: cover;
+    }
+
+    .stream-header,
+    .stream-footer{
+      position: absolute;
+      width: 100%;
+      left: 0;
+      right: 0;
+    }
+
+    .stream-header{
+      top: 0;
+    }
+
+    .stream-footer{
+      bottom: 0;
+      z-index: 3;
+    }
+
+    .stream-message-block{
+      position: absolute;
+      bottom: 0;
+      opacity: .5;
+      transition: 1s;
+      z-index: 2;
+    }
+
+    .show-message{
+      bottom: 23vh;
+      opacity: 1;
+    }
+
+    .stream-message{
+      width: 38vh;
+      cursor: pointer;
+    }
+
+    .stream-gift-block{
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      display: flex;
+      /* display: none; */
+      justify-content: center;
+      align-items: center;
+      z-index: 10;
+    }
+
+    .show-gift{
+      animation: 1.2s scaleGift  ease-in forwards;
+    }
+
+    @keyframes scaleGift{
+      0% {
+        transform: translate(-50%, -50%) scale(0);
+      }
+      80%{
+        transform: translate(-50%, -50%) scale(1);
+      }
+      85%{
+        transform: translate(-50%, -50%) scale(1);
+        opacity: 1;
+      }
+      100%{
+        transform: translate(-50%, -50%) scale(.8);
+        opacity: 0;
+      }
+    }
+
+    .stream-gift{
+      height: 52vh;
+    }
+  </style>
+</head>
+<body>
+  <div class="media">
+    <audio id="myAudio" loop>
+    	<source src="Footage/Aeviewer/aspire-pryces-main-version-02-12-3077.mp3" type="audio/mpeg">
+  	</audio>
+  </div>
+  <div class="media">
+    <audio id="errorAudio">
+    	<source src="Footage/Aeviewer/Error.mp3" type="audio/mpeg">
+  	</audio>
+  </div>
+  <div class="media">
+    <audio id="fNotifAudio">
+    	<source src="Footage/Aeviewer/Pop Ding Notification Sound 1.mp3" type="audio/mpeg">
+  	</audio>
+  </div>
+  <div class="media">
+    <audio id="sNotifAudio">
+    	<source src="Footage/Aeviewer/Pop Ding Notification Sound 2.mp3" type="audio/mpeg">
+  	</audio>
+  </div>
+  <div class="media">
+    <audio id="tapAudio">
+    	<source src="Footage/Aeviewer/pop-up.mp3" type="audio/mpeg">
+  	</audio>
+  </div>
+  <div class="media">
+    <audio id="whooshAudio">
+    	<source src="Footage/Aeviewer/whoosh.mp3" type="audio/mpeg">
+  	</audio>
+  </div>
+  <div class="media">
+    <audio id="incomingAudio">
+    	<source src="Footage/Aeviewer/Incoming Message.mp3" type="audio/mpeg">
+  	</audio>
+  </div>
+
+  <div class="wrap">
+    <div class="mask">
+      <div class="container main active">
+        <a href="#" class="start">
+          <div class="media">
+            <img src="Footage/Images/Logo/plamfy.svg" alt="" class="main_logo">
+          </div>
+        </a>
+        <div class="media">
+            <img src="Footage/Images/Hand/Hand.svg" alt="" class="hand">
+        </div>
+        <div class="list">
+          <a href="#" class="btn btn-left" data-type="error">
+            <div class="media">
+              <img class="avatar" src="Footage/Images/Buttons/Sophia.webp" alt=""> 
+              <img class="view" src="Footage/Images/Buttons/Call.svg" alt="">
+            </div>
+          </a>
+          <a href="#" class="btn btn-right" data-type="model" data-name="Isabella">
+            <div class="media">
+              <img class="avatar" src="Footage/Images/Buttons/Isabella.webp" alt=""> 
+              <img class="view" src="Footage/Images/Buttons/Call.svg" alt="">
+            </div>
+          </a>
+          <a href="#" class="btn btn-left" data-type="model" data-name="Mia">
+            <div class="media">
+              <img class="avatar" src="Footage/Images/Buttons/Mia.webp" alt="">
+              <img class="view" src="Footage/Images/Buttons/Call.svg" alt="">
+            </div>
+          </a>
+          <a href="#" class="btn btn-right" data-type="model" data-name="Olivia">
+            <div class="media">
+              <img class="avatar" src="Footage/Images/Buttons/Olivia.webp" alt=""> 
+              <img class="view" src="Footage/Images/Buttons/Call.svg" alt="">
+            </div>
+          </a>
+          <a href="#" class="btn btn-left" data-type="error">
+            <div class="media">
+              <img class="avatar" src="Footage/Images/Buttons/Ava.webp" alt="">
+              <img class="view" src="Footage/Images/Buttons/Call.svg" alt="">
+            </div>
+          </a>
+          <a href="#" class="btn btn-right" data-type="error">
+            <div class="media">
+              <img class="avatar" src="Footage/Images/Buttons/Emma.webp" alt=""> 
+              <img class="view" src="Footage/Images/Buttons/Call.svg" alt="">
+            </div>
+          </a>
+        </div>
+
+        <div class="overlay"></div>
+        <div class="preview">
+          <div class="card">
+            <a class="close" href="#">
+              <div class="media"><img src="Footage/Images/Buttons/Close.svg" alt=""></div>
+            </a>
+            <div class="wrap-video Isabella">
+              <video autoplay muted loop src="Footage/Movies/155260208162_Lii_UA_2584.mp4"></video>
+              <img class="stream-header" src="Footage/Images/Stream/Stream-Isabella.webp" alt="">
+               <img class="stream-message" src="Footage/Images/Stream/message_Isabella.webp" alt="">
+              <div class="preview-info">
+                <div class="media">
+                  <img class="avatar" src="Footage/Images/Buttons/Isabella.webp" alt=""> 
+                  <img class="view" src="Footage/Images/Buttons/Call.svg" alt="">
+                </div>
+              </div>
+            </div>
+            <div class="wrap-video Mia">
+              <video autoplay muted loop src="Footage/Movies/202186507735_Regina_VE_422.mp4"></video>
+              <img class="stream-header" src="Footage/Images/Stream/Stream-Mia.webp" alt="">
+              <img class="stream-message" src="Footage/Images/Stream/message_Mia.webp" alt="">
+              <div class="preview-info">
+                <div class="media">
+                  <img class="avatar" src="Footage/Images/Buttons/Mia.webp" alt=""> 
+                  <img class="view" src="Footage/Images/Buttons/Call.svg" alt="">
+                </div>
+              </div>
+            </div>
+            <div class="wrap-video Olivia">
+              <video autoplay muted loop src="Footage/Movies/198324129095_Mili_AR_609.mp4"></video>
+              <img class="stream-header" src="Footage/Images/Stream/Stream-Olivia.webp" alt="">
+              <img class="stream-message" src="Footage/Images/Stream/message_Olivia.webp" alt="">
+              <div class="preview-info">
+                <div class="media">
+                  <img class="avatar" src="Footage/Images/Buttons/Olivia.webp" alt=""> 
+                  <img class="view" src="Footage/Images/Buttons/Call.svg" alt="">
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="stream">
+          <div class="media stream-header-block">
+          </div>
+          <div class="media">
+            <img class="stream-footer" src="Footage/Images/Stream/Stream-Footer.svg" alt="">
+          </div>
+          <div class="media stream-message-block">
+          </div>
+          <div class="media stream-gift-block">
+            <img class="stream-gift" src="Footage/Images/Stream/Gift.svg" alt="">
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="end-card">
+      <div class="end-content">
+        <div class="media">
+          <img class="end-logo" src="Footage/Images/Logo/end-logo.svg" alt="">
+        </div>
+        <div class="btn-wrap">
+          <a href="#" class="IOS">
+            <div class="media">
+              <img src="Footage/Images/Buttons/IOS.svg" alt="">
+            </div>
+          </a>
+          <a href="#" class="Android">
+            <div class="media">
+              <img src="Footage/Images/Buttons/Android.svg" alt="">
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    const audio = document.querySelector("#myAudio"); 
+    const errorAudio = document.querySelector("#errorAudio");
+    const fNotifAudio = document.querySelector("#fNotifAudio"); 
+    const sNotifAudio = document.querySelector("#sNotifAudio"); 
+    const tapAudio = document.querySelector("#tapAudio"); 
+    const whooshAudio = document.querySelector("#whooshAudio"); 
+    const incomingAudio = document.querySelector("#incomingAudio"); 
+    const start = document.querySelector('.start');
+    const hand = document.querySelector('.hand');
+    const start_media = start.querySelector('.media');
+    const list_btns = document.querySelectorAll('.list .btn');
+    const overlay = document.querySelector('.overlay');
+    const preview = document.querySelector('.preview');
+    const close = document.querySelector('.close');
+    const wrap_video = document.querySelectorAll('.wrap-video');
+    const endCard = document.querySelector('.end-card');
+    const stream = document.querySelector('.stream');
+    const stream_header_block = stream.querySelector('.stream-header-block');
+    const stream_message_block = stream.querySelector('.stream-message-block');
+    const stream_gift_block = stream.querySelector('.stream-gift-block');
+    const IOS = endCard.querySelector('.IOS');
+    const Android = endCard.querySelector('.Android');
+    let currentBtn = null;
+    let isVisiblePreview = false;
+
+    let delay = 10*1000;
+    let timer;
+    let timerGift;
+
+    timer = setTimeout( showEnd, delay);
+
+    const tryPlay = () => {
+      audio.volume = 0.2;
+			audio.play().catch(err => {
+				console.log("Ошибка воспроизведения:", err);
+			});
+
+			document.body.removeEventListener("click", tryPlay);
+			document.body.removeEventListener("touchstart", tryPlay);
+
+		};
+
+		document.body.addEventListener("click", tryPlay, { once: true });
+		document.body.addEventListener("scroll", tryPlay, { once: true });
+
+    function btnStartAnimation(e){
+      clearTimeout(timer);
+      timer = setTimeout( showEnd, delay);
+      e.preventDefault();
+      start_media.classList.add('click');
+      hand.style.display = 'none';
+      for (const btn of list_btns) {
+        btn.classList.add('click');
+        btn.addEventListener('click', btn_interaction);
+      }
+    }
+
+    function btn_interaction(e){
+      clearTimeout(timer);
+      currentBtn = this;
+      e.preventDefault();
+      switch(this.dataset.type){
+        case 'error': 
+           errorPreview(currentBtn); 
+           break;
+        case 'model': 
+           openPreview(e);
+           break;
+      }
+    }
+
+    function openPreview(e){
+      tapAudio.play().catch(err => {
+        console.error('Ошибка воспроизведения:', err);
+      });
+      e.preventDefault();
+      isVisiblePreview = true;
+      let currentWrapVideo = document.querySelector('.'+currentBtn.dataset.name);
+      currentWrapVideo.style.display = 'block';
+      currentBtn.classList.add('press');
+      overlay.classList.add('show');
+      preview.classList.add('show');
+      currentWrapVideo.querySelector('img.view').addEventListener('click', (e)=>showStream(e,currentWrapVideo));
+    }
+
+    function closePreview(e){
+      sNotifAudio.play().catch(err => {
+        console.error('Ошибка воспроизведения:', err);
+      });
+      e.preventDefault();
+      isVisiblePreview = false;
+      overlay.classList.add('hide');
+      preview.classList.add('hide');
+      currentBtn.classList.remove('press');
+    }
+
+    function resetClassPreview(){
+      if(!isVisiblePreview ){
+        overlay.classList.remove('show');
+        preview.classList.remove('show');
+        overlay.classList.remove('hide');
+        preview.classList.remove('hide');
+        wrap_video.forEach( item =>{
+          item.style.display = 'none';
+        })
+      }
+    }
+
+    function errorPreview(currentBtn){
+      errorAudio.play().catch(err => {
+        console.error('Ошибка воспроизведения:', err);
+      });
+
+      currentBtn.classList.add('animErrorBtn');
+      currentBtn.addEventListener('animationend', ()=>{
+        currentBtn.classList.remove('animErrorBtn');
+      }, {ones: true} );
+    }
+
+    function showStream(e, currentWrapVideo){
+      tapAudio.play().catch(err => {
+        console.error('Ошибка воспроизведения:', err);
+      });
+      
+      e.preventDefault();
+      stream.style.display = 'block';
+      stream.append(currentWrapVideo.querySelector('video'));
+      stream_header_block.append(currentWrapVideo.querySelector('.stream-header'));
+      stream_message_block.append(currentWrapVideo.querySelector('.stream-message'));
+      setTimeout( ()=>{stream_message_block.classList.add('show-message')}, 10);
+      stream_message_block.addEventListener('click', showGift);
+      timerGift = setTimeout( showGift, 5000);
+    }
+
+    function showHand(){
+      hand.style.opacity = 1;
+    }
+
+    function showGift(){
+      incomingAudio.play().catch(err => {
+        console.error('Ошибка воспроизведения:', err);
+      });
+
+      clearTimeout(timerGift);
+      stream_gift_block.classList.add('show-gift');
+      setTimeout( showEnd, 2000);
+    }
+
+    function showEnd(){
+      endCard.style.display = 'block';
+    }
+   
+    document.body.addEventListener('click', btnStartAnimation);
+    start.addEventListener('click', btnStartAnimation);
+    start.addEventListener('animationend', showHand);
+    start.addEventListener('click', () => {
+      fNotifAudio.play().catch(err => {
+        console.error('Ошибка воспроизведения:', err);
+      });
+
+      setTimeout(()=>{
+        whooshAudio.play().catch(err => {
+          console.error('Ошибка воспроизведения:', err);
+        });
+      },600)
+
+    }, {ones: true});
+    close.addEventListener('click', closePreview);
+    overlay.addEventListener('transitionend', resetClassPreview);
+
+    IOS.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      if (typeof mraid !== "undefined" && mraid.open) {
+        mraid.open("https://apps.apple.com/ua/app/plamfy-watch-streams-go-live/id1601377257");
+      } else {
+        window.open("https://apps.apple.com/us/app/toplive-live-video-chat-app/id1598551382", "_blank");
+      }
+		});
+
+    Android.addEventListener("click", (e) => {
+      e.preventDefault();
+
+      if (typeof mraid !== "undefined" && mraid.open) {
+        mraid.open("https://play.google.com/store/apps/details?id=com.plamfy.platform&hl=en");
+      } else {
+        window.open("https://apps.apple.com/us/app/toplive-live-video-chat-app/id1598551382", "_blank");
+      }
+		});
+  </script>
+</body>
+</html>
